@@ -51,11 +51,15 @@ function findBy(filter) {
     ]
    */
 
+  return db("users as u")
+  .select("u.user_id", "u.username", "u.password", "r.role_name")
+  .join("roles as r", "u.role_id", "=", "r.role_id")
+  .where(filter)
 }
 
 function findById(user_id) {
   //sql query
-// select user_id,username, password, r.role_name
+// select user_id,username, r.role_name
 // from users
 // join roles as r
 // on users.role_id = r.role_id
@@ -71,6 +75,11 @@ function findById(user_id) {
       "role_name": "instructor"
     }
    */
+  return db("users as u")
+  .select("u.user_id","u.username", "r.role_name")
+  .join("roles as r", "u.role_id", "=", "r.role_id")
+  .where( "user_id", user_id ).first()
+
 }
 
 /**

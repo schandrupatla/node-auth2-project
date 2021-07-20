@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const bcrypt = require('bcryptjs');
 const Users = require("../users/users-model");
+const tokenBuilder = require('./token-builder')
 const { checkUsernameExists, validateRoleName } = require('./auth-middleware');
 const { JWT_SECRET } = require("../secrets"); // use this secret!
 
@@ -16,20 +17,24 @@ router.post("/register", validateRoleName, (req, res, next) => {
       "role_name": "angel"
     }
    */
-  let user = req.body;
-
+  // let user = req.body;
+  let user ={
+    username :req.body.username,
+    password: req.body.password,
+    role_name:req.role_name
+  }
   // bcrypting the password before saving
   const rounds = process.env.BCRYPT_ROUNDS || 8; // 2 ^ 8
   const hash = bcrypt.hashSync(user.password, rounds);
 
   // never save the plain text password in the db
   user.password = hash
-
+ 
   Users.add(user)
     .then(saved => {
-      res.status(201).json({ message: `Great to have you, ${saved.username}` });
+      res.status(201).json(saved);
     })
-    .catch(next); // our custom err handling middleware in server.js will trap this
+    .catch(next);
 });
 
 
@@ -53,6 +58,22 @@ router.post("/login", checkUsernameExists, (req, res, next) => {
       "role_name": "admin" // the role of the authenticated user
     }
    */
+  let { username, password } = req.body;
+  Users.findBy({ username }) // it would be nice to have middleware do this
+    .then(([user]) => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        // generate a token and send it back
+        const token = tokenBuilder(user)
+        // the client will provide token in future requests
+        res.status(200).json({
+          message: `${user.username} is back!`,
+          token,
+        });
+      } else {
+        next({ status: 401, message: 'Invalid Credentials' });
+      }
+    })
+    .catch(next);
 });
 
 module.exports = router;

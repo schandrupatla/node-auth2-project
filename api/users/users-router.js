@@ -48,4 +48,13 @@ router.get("/:user_id", restricted, only('admin'), (req, res, next) => { // done
     .catch(next);
 });
 
+//findby
+router.get("/:username", (req,res,next)=>{
+  Users.findBy(req.param.username)
+  .then(users =>{
+    res.status(200).json(users);
+  })
+  .catch(next);
+})
+
 module.exports = router;

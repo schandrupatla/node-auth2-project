@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const { JWT_SECRET } = require("../secrets"); // use this secret!
-
-
+const db = require("../users/users-model")
 const restricted = (req, res, next) => {
   /*
     If the user does not provide a token in the Authorization header:
@@ -24,7 +23,7 @@ const restricted = (req, res, next) => {
     }
     jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
           if (err) {
-            return next({ status: 401, message: `your token sucks: ${err.message}`})
+            return next({ status: 401, message: `Token invalid"`})
           }
           req.decodedJwt = decodedToken
     next()
@@ -42,10 +41,15 @@ const only = role_name => (req, res, next) => {
 
     Pull the decoded token from the req object, to avoid verifying it again!
   */
+ const dToken = req.decodedJwt;
+ if (!dToken || (req.body.role_name !== role_name)) {
+  return next({ status: 401, message:  "This is not for you" })
+}
+ 
 }
 
 
-const checkUsernameExists = (req, res, next) => {
+const checkUsernameExists = async (req, res, next) => {
   /*
     If the username in req.body does NOT exist in the database
     status 401
@@ -53,6 +57,22 @@ const checkUsernameExists = (req, res, next) => {
       "message": "Invalid credentials"
     }
   */
+ try{
+  const users = await db.findBy({username:req.body.username})
+  if(users.length){
+    req.user =users[0]
+    next()
+  }
+  else{
+    next({
+      status:401,
+      message:"Invalid credentials"
+    })
+  }
+}
+catch(err){
+ next(err)
+}
 }
 
 
@@ -93,9 +113,15 @@ const validateRoleName = (req, res, next) => {
         status:422,
         message: "Role name can not be admin"
       })
+    }else{
+      req.role_name =req.body.role_name;
+      next();
     }
+ }else{
+  req.role_name = "student";
+  next();
  }
-
+ 
 }
 
 module.exports = {
