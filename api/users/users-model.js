@@ -24,6 +24,10 @@ function find() {
       }
     ]
    */
+  return db("users")
+  .join("roles as r", "users.role_id", "=", "r.role_id")
+  .select("user_id", "username", "password, r.role-name")
+  .orderBy("user_id");
 }
 
 function findBy(filter) {
@@ -46,7 +50,7 @@ function findBy(filter) {
       }
     ]
    */
-  
+
 }
 
 function findById(user_id) {

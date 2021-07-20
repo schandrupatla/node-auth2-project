@@ -1,4 +1,6 @@
 const router = require("express").Router();
+const bcrypt = require('bcryptjs');
+const Users = require("../users/users-model");
 const { checkUsernameExists, validateRoleName } = require('./auth-middleware');
 const { JWT_SECRET } = require("../secrets"); // use this secret!
 
@@ -14,6 +16,20 @@ router.post("/register", validateRoleName, (req, res, next) => {
       "role_name": "angel"
     }
    */
+  let user = req.body;
+
+  // bcrypting the password before saving
+  const rounds = process.env.BCRYPT_ROUNDS || 8; // 2 ^ 8
+  const hash = bcrypt.hashSync(user.password, rounds);
+
+  // never save the plain text password in the db
+  user.password = hash
+
+  Users.add(user)
+    .then(saved => {
+      res.status(201).json({ message: `Great to have you, ${saved.username}` });
+    })
+    .catch(next); // our custom err handling middleware in server.js will trap this
 });
 
 
