@@ -1,6 +1,12 @@
 const db = require('../../data/db-config.js');
 
 function find() {
+  //sql query
+//select user_id,username, password, r.role_name
+// from users
+// join roles as r
+// on users.role_id = r.role_id
+
   /**
     You will need to join two tables.
     Resolves to an ARRAY with all users.
@@ -21,6 +27,12 @@ function find() {
 }
 
 function findBy(filter) {
+  //sql query
+  //select user_id,username, password, r.role_name
+  // from users
+  // join roles as r
+  // on users.role_id = r.role_id
+  // where users.username ='bob'
   /**
     You will need to join two tables.
     Resolves to an ARRAY with all users that match the filter condition.
@@ -34,9 +46,17 @@ function findBy(filter) {
       }
     ]
    */
+  
 }
 
 function findById(user_id) {
+  //sql query
+// select user_id,username, password, r.role_name
+// from users
+// join roles as r
+// on users.role_id = r.role_id
+// where user_id =1
+
   /**
     You will need to join two tables.
     Resolves to the user with the given user_id.
