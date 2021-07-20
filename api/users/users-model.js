@@ -64,7 +64,6 @@ function findById(user_id) {
 // join roles as r
 // on users.role_id = r.role_id
 // where user_id =1
-
   /**
     You will need to join two tables.
     Resolves to the user with the given user_id.
