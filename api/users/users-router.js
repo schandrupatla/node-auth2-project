@@ -20,7 +20,7 @@ const { restricted, only } = require("../auth/auth-middleware.js");
 router.get("/", restricted, (req, res, next) => { // done for you
   Users.find()
     .then(users => {
-      res.json(users);
+      res.status(200).json(users)
     })
     .catch(next);
 });
