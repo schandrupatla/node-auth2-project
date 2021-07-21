@@ -42,8 +42,9 @@ const only = role_name => (req, res, next) => {
     Pull the decoded token from the req object, to avoid verifying it again!
   */
  const dToken = req.decodedJwt;
- if (!dToken || (req.body.role_name !== role_name)) {
-  return next({ status: 401, message:  "This is not for you" })
+//  if (!dToken || (req.body.role_name !== role_name)) {
+  if (!dToken  || (dToken.role_name !== role_name)) {
+  return next({ status: 403, message:  "This is not for you" })
 }
 else{
   next()
